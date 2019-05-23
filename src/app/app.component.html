@@ -1,16 +1,1 @@
-<hello name="{{ name }}"></hello>
-<hr>
-
-<app-table matSort [dataSource]="dataSource" [trackBy]="trackByFn">
-  <ng-container col="symbol">
-    <td *cell="let item">{{ item.symbol }}</td>
-  </ng-container>
-  <ng-container col="name">
-    <td *cell="let item">{{ item.name }}</td>
-  </ng-container>
-  <ng-container col="weight">
-    <td *cell="let item">{{ item.weight }}</td>
-  </ng-container>
-
-  <tr class="my-class" table-row *row="let item; columns: columns"></tr>
-</app-table>
+<app-table-wrapper></app-table-wrapper>

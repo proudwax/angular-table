@@ -1,0 +1,71 @@
+<table *ngIf="contentHeaderRow.sticky" #headerSticky class="table table_sticky">
+  <ng-container *ngTemplateOutlet="colgroup"></ng-container>
+
+  <ng-container *ngTemplateOutlet="header"></ng-container>
+</table>
+
+<cdk-virtual-scroll-viewport
+  [itemSize]="virtualScrollItemSize"
+  class="ps virtual-scroll-viewport"
+  [ngStyle]="{ height: tableHeight + 'px' }"
+  [perfectScrollbar]="configPerfectScroll"
+>
+  <table>
+    <ng-container *ngTemplateOutlet="colgroup"></ng-container>
+
+    <ng-container *ngIf="!contentHeaderRow.sticky">
+      <ng-container *ngTemplateOutlet="header"></ng-container>
+    </ng-container>
+
+    <ng-container
+      *cdkVirtualFor="
+        let item of dataSource;
+        let index = index;
+        let count = count;
+        let first = first;
+        let last = last;
+        let even = even;
+        let odd = odd;
+        trackBy: trackBy
+      "
+    >
+      <ng-container *ngFor="let row of virtualRows">
+        <ng-container
+          *ngTemplateOutlet="
+            row.template;
+            context: {
+              $implicit: {
+                data: item,
+                cols: row.virtualCells,
+                index: index,
+                count: count,
+                first: first,
+                last: last,
+                even: even,
+                odd: odd
+              }
+            }
+          "
+        >
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </table>
+</cdk-virtual-scroll-viewport>
+
+<ng-template #header>
+  <ng-container *ngFor="let headerRow of headerRows">
+    <ng-container
+      *ngTemplateOutlet="
+        contentHeaderRow.template;
+        context: { $implicit: headerRow }
+      "
+    ></ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #colgroup>
+  <colgroup>
+    <col *ngFor="let width of colWidth" [attr.width]="width" />
+  </colgroup>
+</ng-template>
