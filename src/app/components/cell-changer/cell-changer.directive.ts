@@ -4,27 +4,37 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
+  Optional,
   Output,
   TemplateRef,
-  ViewContainerRef,
-  HostListener
+  ViewContainerRef
 } from '@angular/core';
 import { CellChangerComponent } from './cell-changer.component';
+import { RowChangerDirective } from './row-changer.directive';
+import { VirtualCellDirective } from '../table/cell';
+import { RowComponent } from '../table/row';
 
 @Directive({
   selector: '[cellChanger]'
 })
-export class CellChangerDirective implements OnChanges {
+export class CellChangerDirective implements OnInit, OnChanges {
   @Input('cellChanger') value: string | number | null;
   @Input() cellChangerIsEdit: boolean = false;
+  @Input() cellChangerRow: RowChangerDirective;
 
   @Output() cellChange = new EventEmitter<string>();
 
   constructor(
     private _templateRef: TemplateRef<void>,
     private _viewContainerRef: ViewContainerRef,
-    private _componentFactoryResolver: ComponentFactoryResolver
-  ) {
+    private _componentFactoryResolver: ComponentFactoryResolver,
+    @Optional() private _parent: VirtualCellDirective,
+    @Optional() private _row: RowComponent
+  ) {}
+
+  ngOnInit() {
+    // console.log(this);
   }
 
   ngOnChanges() {

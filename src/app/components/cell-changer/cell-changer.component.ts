@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -25,7 +24,7 @@ let nextUniqueId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class CellChangerComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CellChangerComponent implements OnInit, OnDestroy {
   private _destroyed = new Subject<void>();
 
   public tabIndex: number | null = null;
@@ -66,17 +65,13 @@ export class CellChangerComponent implements OnInit, AfterViewInit, OnDestroy {
     public _viewContainer: ViewContainerRef,
     private _cdr: ChangeDetectorRef,
     private _elementRef: ElementRef,
-    @Attribute('tabindex') tabIndex: string
+    @Attribute('tabindex') tabIndex: string // @Optional() private _parent: RowChangerDirective
   ) {
     this.tabIndex = parseInt(tabIndex) || 0;
   }
 
   ngOnInit() {
-    // console.log(this);
-  }
-
-  ngAfterViewInit() {
-    // console.log(this);
+    console.log(this);
   }
 
   ngOnDestroy() {

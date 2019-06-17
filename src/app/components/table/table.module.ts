@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { TableComponent } from './table.component';
+import { HeaderRowComponent, CellOutlet, RowComponent } from './row';
+import { HeaderCellDirective, VirtualCellDirective } from './cell';
 
 import {
   ColDirective,
   VirtualRowDirective,
-  HeaderCellDirective,
-  VirtualCellDirective,
-  HeaderRowDirective
+  HeaderRowDirective,
+  HeaderRowOutletDirective,
+  RowOutletDirective
 } from './table.directive';
 
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
@@ -23,11 +25,16 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 @NgModule({
   declarations: [
     TableComponent,
+    HeaderRowOutletDirective,
+    HeaderRowDirective,
+    HeaderRowComponent,
+    HeaderCellDirective,
     VirtualRowDirective,
     VirtualCellDirective,
-    HeaderCellDirective,
     ColDirective,
-    HeaderRowDirective
+    CellOutlet,
+    RowOutletDirective,
+    RowComponent,
   ],
   imports: [CommonModule, ScrollingModule, PerfectScrollbarModule],
   exports: [
@@ -36,7 +43,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     HeaderCellDirective,
     VirtualCellDirective,
     VirtualRowDirective,
-    HeaderRowDirective
+    HeaderRowDirective,
+    HeaderRowComponent,
+    RowComponent
   ],
   providers: [
     {
