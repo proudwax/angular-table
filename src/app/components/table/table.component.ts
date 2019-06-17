@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -6,31 +7,28 @@ import {
   ContentChild,
   ContentChildren,
   ElementRef,
+  HostBinding,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   QueryList,
   SimpleChanges,
+  TemplateRef,
   ViewChild,
-  ViewEncapsulation,
-  HostBinding
+  ViewEncapsulation
 } from '@angular/core';
-import {
-  trigger,
-  state,
-  style,
-  transition,
-  animate
-} from '@angular/animations';
+import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 
 import {
   ColDirective,
-  HeaderCellDirective,
   HeaderRowDirective,
+  HeaderRowOutletDirective,
+  RowOutlet,
   VirtualRowDirective
 } from './table.directive';
-import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
+import { HeaderCellDirective } from './cell';
+import { CellOutlet } from './row';
 
 @Component({
   selector: 'app-table',
@@ -55,7 +53,7 @@ export class TableComponent
 
   @HostBinding('@detailExpand') detailExpand = true;
 
-  public headerRows: any[];
+  public headerCells: any[];
   public virtualRows: any[];
   public colWidth: any[];
   public virtualScrollItemSize: number;
@@ -71,9 +69,11 @@ export class TableComponent
   perfectScrollbar?: PerfectScrollbarDirective;
 
   @ViewChild('headerSticky') nodeHeaderSticky: ElementRef;
+  @ViewChild(HeaderRowOutletDirective)
+  headerRowOutlet: HeaderRowOutletDirective;
   @ContentChildren(VirtualRowDirective)
   contentRows: QueryList<VirtualRowDirective>;
-  @ContentChild(HeaderRowDirective) contentHeaderRow: HeaderRowDirective;
+  @ContentChild(HeaderRowDirective) headerRow: HeaderRowDirective;
   @ContentChildren(ColDirective) contentCols: QueryList<ColDirective>;
 
   constructor(private _cdr: ChangeDetectorRef) {}
@@ -82,7 +82,7 @@ export class TableComponent
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.tableHeight && changes.tableHeight.previousValue !== void 0) {
-      this._isSticky(this.contentHeaderRow.sticky);
+      this._isSticky(this.headerRow.sticky);
     }
 
     if (changes.dataSource && changes.dataSource.previousValue !== undefined) {
@@ -91,14 +91,17 @@ export class TableComponent
   }
 
   ngAfterViewInit() {
-    this._isSticky(this.contentHeaderRow.sticky);
+    this._isSticky(this.headerRow.sticky);
     this._initTable();
   }
 
   private _initTable(): void {
     this.virtualScrollItemSize = 0;
 
-    this.colWidth = this.contentHeaderRow.columns.map((name: string) => {
+    /**
+     * @return (string | number)[];
+     */
+    this.colWidth = this.headerRow.columns.map((name: string) => {
       const column = this.contentCols.find(
         (col: ColDirective) => col.name === name
       );
@@ -106,16 +109,30 @@ export class TableComponent
       return column.width !== void 0 ? column.width : 'auto';
     });
 
-    this.headerRows = this.contentCols.first.headerCells.map(
-      (cell: HeaderCellDirective, index: number) => {
-        const cells = this.contentHeaderRow.columns.map((name: string) => {
-          const column = this.contentCols.find(col => col.name === name);
+    /**
+     * From array of Col with array headerCell to array HeaderRow with array headerCell
+     * @return [ HeaderCellDirective[] ];
+     */
+    this.headerCells = this.headerRow.columns.reduce(
+      (total: any[], name: string) => {
+        const column = this.contentCols.find(col => col.name === name);
 
-          return column.headerCells.toArray()[index];
-        });
+        column.headerCells.map(
+          (headerCell: HeaderCellDirective, index: number) => {
+            if (!Array.isArray(total[index])) {
+              total[index] = [];
+            }
+            total[index].push(headerCell);
+          }
+        );
 
-        return cells;
-      }
+        return total;
+      },
+      []
+    );
+
+    this.headerCells.forEach((cells, i) =>
+      this._renderRow(this.headerRowOutlet, this.headerRow.template, cells, i)
     );
 
     this.virtualRows = this.contentRows.map(row => {
@@ -146,5 +163,28 @@ export class TableComponent
     }
   }
 
-  ngOnDestroy() {}
+  private _renderRow(
+    outlet: RowOutlet,
+    rowTemplate: TemplateRef<any>,
+    cells: any[],
+    index: number,
+    context = {}
+  ) {
+    outlet.viewContainer.createEmbeddedView(rowTemplate, context, index);
+
+    for (const cell of cells) {
+      if (CellOutlet.mostRecentCellOutlet) {
+        CellOutlet.mostRecentCellOutlet._viewContainer.createEmbeddedView(
+          cell.template,
+          context
+        );
+      }
+    }
+
+    this._cdr.markForCheck();
+  }
+
+  ngOnDestroy() {
+    this.headerRowOutlet.viewContainer.clear();
+  }
 }

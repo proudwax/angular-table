@@ -72,11 +72,11 @@ export class CellChangerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log(this);
+    // console.log(this);
   }
 
   ngAfterViewInit() {
-    console.log(this);
+    // console.log(this);
   }
 
   ngOnDestroy() {

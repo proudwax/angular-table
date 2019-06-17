@@ -3,9 +3,11 @@ import {
   OnInit,
   ViewChild,
   Injector,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ViewChildren
 } from '@angular/core';
 import { MatTableDataSource, MatSort } from '@angular/material';
+import { RowChangerDirective } from '../cell-changer/row-changer.directive';
 
 export interface PeriodicElement {
   name: string;
@@ -124,10 +126,12 @@ const ELEMENT_DATA: PeriodicElement[] = [
 })
 export class TableWrapperComponent implements OnInit {
   dataSource: MatTableDataSource<any>;
-  defColumns = ['symbol', 'name', 'weight'];
+  defColumns = ['symbol', 'name', 'position', 'weight'];
   columns = this.defColumns.slice();
 
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort)
+  sort: MatSort;
+  @ViewChild(RowChangerDirective) rowTest: RowChangerDirective;
 
   constructor(public injector: Injector) {}
 

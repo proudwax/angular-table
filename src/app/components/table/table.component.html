@@ -1,4 +1,4 @@
-<table *ngIf="contentHeaderRow.sticky" #headerSticky class="table table_sticky">
+<table *ngIf="headerRow.sticky" #headerSticky class="table table_sticky">
   <ng-container *ngTemplateOutlet="colgroup"></ng-container>
 
   <ng-container *ngTemplateOutlet="header"></ng-container>
@@ -13,7 +13,7 @@
   <table>
     <ng-container *ngTemplateOutlet="colgroup"></ng-container>
 
-    <ng-container *ngIf="!contentHeaderRow.sticky">
+    <ng-container *ngIf="!headerRow.sticky">
       <ng-container *ngTemplateOutlet="header"></ng-container>
     </ng-container>
 
@@ -29,39 +29,21 @@
         trackBy: trackBy
       "
     >
-      <ng-container *ngFor="let row of virtualRows">
-        <ng-container
-          *ngTemplateOutlet="
-            row.template;
-            context: {
-              $implicit: {
+      <ng-container [rowOutlet]="{
                 data: item,
-                cols: row.virtualCells,
+                rows: virtualRows,
                 index: index,
                 count: count,
                 first: first,
                 last: last,
                 even: even,
-                odd: odd
-              }
-            }
-          "
-        >
-        </ng-container>
-      </ng-container>
+                odd: odd}"></ng-container>
     </ng-container>
   </table>
 </cdk-virtual-scroll-viewport>
 
 <ng-template #header>
-  <ng-container *ngFor="let headerRow of headerRows">
-    <ng-container
-      *ngTemplateOutlet="
-        contentHeaderRow.template;
-        context: { $implicit: headerRow }
-      "
-    ></ng-container>
-  </ng-container>
+  <ng-container headerRowOutlet></ng-container>
 </ng-template>
 
 <ng-template #colgroup>

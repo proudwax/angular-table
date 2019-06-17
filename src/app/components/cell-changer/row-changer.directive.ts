@@ -9,7 +9,8 @@ import { fromEvent, merge, Observable, Subject } from 'rxjs';
 import { filter, switchMap, take, takeUntil } from 'rxjs/operators';
 
 @Directive({
-  selector: '[rowChanger]'
+  selector: '[rowChanger]',
+  exportAs: 'rowChange'
 })
 export class RowChangerDirective implements AfterViewInit {
   private _destroyed = new Subject<void>();

@@ -1,25 +1,29 @@
-import { CdkVirtualForOfContext } from '@angular/cdk/scrolling';
 import {
   ContentChild,
   ContentChildren,
   Directive,
+  ElementRef,
   Input,
-  TemplateRef
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  TemplateRef,
+  ViewContainerRef
 } from '@angular/core';
+import { VirtualCellDirective, HeaderCellDirective } from './cell';
+import { CellOutlet } from './row';
 
-@Directive({
-  selector: '[headerCell]'
-})
-export class HeaderCellDirective {
-  constructor(public template: TemplateRef<any>) {}
+export interface RowOutletContext {
+  data: any;
+  rows: any[];
+  index: number;
+  count: number;
+  first: boolean;
+  last: boolean;
+  even: boolean;
+  odd: boolean;
 }
 
-@Directive({
-  selector: '[virtualCell]'
-})
-export class VirtualCellDirective {
-  constructor(public template: TemplateRef<CdkVirtualForOfContext<any>>) {}
-}
 
 @Directive({
   selector: '[virtualRow]'
@@ -60,4 +64,67 @@ export class ColDirective {
   @ContentChild(VirtualCellDirective) virtualCell: VirtualCellDirective;
 
   constructor() {}
+}
+
+export interface RowOutlet {
+  viewContainer: ViewContainerRef;
+}
+
+@Directive({ selector: '[headerRowOutlet]' })
+export class HeaderRowOutletDirective implements RowOutlet {
+  constructor(
+    public viewContainer: ViewContainerRef,
+    public elementRef: ElementRef
+  ) {}
+}
+
+@Directive({ selector: '[rowOutlet]' })
+export class RowOutletDirective implements RowOutlet, OnInit, OnChanges {
+  @Input('rowOutlet') context: RowOutletContext;
+
+  constructor(
+    public viewContainer: ViewContainerRef,
+    public elementRef: ElementRef
+  ) {}
+
+  ngOnInit(): void {
+    this._renderRows(this.context);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.context && changes.context.previousValue !== void 0) {
+      const context = changes.context.currentValue;
+
+      this._renderRows(context);
+    }
+  }
+
+  private _renderRows(context: RowOutletContext): void {
+    const { data, rows, index, count, first, last, even, odd } = context;
+
+    this.viewContainer.clear();
+
+    rows.forEach(row => {
+      this.viewContainer.createEmbeddedView(row.template, {
+        $implicit: data,
+        index,
+        count,
+        first,
+        last,
+        even,
+        odd
+      });
+
+      for (const cell of row.virtualCells) {
+        if (CellOutlet.mostRecentCellOutlet) {
+          CellOutlet.mostRecentCellOutlet._viewContainer.createEmbeddedView(
+            cell.template,
+            {
+              $implicit: data
+            }
+          );
+        }
+      }
+    });
+  }
 }
