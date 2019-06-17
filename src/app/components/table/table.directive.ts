@@ -31,6 +31,7 @@ export interface RowOutletContext {
 export class VirtualRowDirective {
   @Input('virtualRowColumns') columns: string[];
   @Input('virtualRowHeight') height = 50;
+  @Input('virtualRowComponent') component: any;
 
   constructor(public template: TemplateRef<any>) {}
 }
@@ -88,6 +89,8 @@ export class RowOutletDirective implements RowOutlet, OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
+    console.log(this.context);
+    
     this._renderRows(this.context);
   }
 

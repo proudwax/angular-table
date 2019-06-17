@@ -25,7 +25,7 @@
     <td class="my-class" *virtualCell="let item"><span>{{ item.position }}</span></td>
   </ng-container>
 
-  <tr class="my-table-row1" rowChanger #rowComponent="rowChange" [ngClass]="{'odd': odd}" row *virtualRow="let row; columns: columns; height: 50; let odd = odd">{{log(rowComponent)}}</tr>
+  <tr class="my-table-row1" rowChanger #rowComponent="rowChange" [ngClass]="{'odd': odd}" row *virtualRow="let row; component: rowComponent; columns: columns; height: 50; let odd = odd"></tr>
 
   <tr class="header" header-row *headerRow="let cells; columns: columns; sticky: true"></tr>
 
